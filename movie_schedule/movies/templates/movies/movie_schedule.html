@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>The Movies list</title>
+    <style>
+        /* CSS styles for the movie list */
+        .movie-list {
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        .movie-card {
+            width: 300px;
+            padding: 10px;
+            margin: 10px;
+            border: 1px solid #ccc;
+        }
+
+        .movie-poster {
+            width: 100%;
+        }
+
+        /* CSS styles for the filter and search components */
+        .filter {
+            margin-bottom: 10px;
+        }
+
+        .search {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+<div class="filter">
+    <label for="genre-filter">Filter by Genre:</label>
+    <select id="genre-filter" multiple>
+        {% for genre in genres %}
+            <option value="{{ genre.id }}">{{ genre.name }}</option>
+        {% endfor %}
+    </select>
+</div>
+
+<div class="search">
+    <label for="title-search">Search by Title:</label>
+    <input type="text" id="title-search">
+</div>
+
+<div id="movie-schedule">
+    <div class="movie-list">
+        {% for movie in movies %}
+            <div class="movie-card">
+                <img src="{{ movie.poster.url }}" alt="{{ movie.title }}" class="movie-poster">
+                <p>
+                    <strong>{{ movie.title }}</strong><br>
+                    Genre(s): {{ movie.genres.all|join:", " }}<br>
+                    Rating: {{ movie.rating }}<br>
+                    Year: {{ movie.year }}<br>
+                    Metacritic Rating: {{ movie.metacritic_rating }}<br>
+                    Runtime: {{ movie.runtime }}
+                </p>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+   
+    const genreFilter = document.getElementById("genre-filter");
+    const titleSearch = document.getElementById("title-search");
+
+    genreFilter.addEventListener("change", () => {
+        const selectedGenres = Array.from(genreFilter.selectedOptions, option => option.value);
+
+        document.querySelectorAll(".movie-card").forEach(movieCard => {
+            const movieGenres = movieCard.getAttribute("data-genres").split(",");
+            if (selectedGenres.length === 0 || selectedGenres.every(genre => movieGenres.includes(genre))) {
+                movieCard.style.display = "block";
+            } else {
+                movieCard.style.display = "none";
+            }
+        });
+    });
+
+    titleSearch.addEventListener("input", () => {
+        const searchString = titleSearch.value.toLowerCase();
+
+        document.querySelectorAll(".movie-card").forEach(movieCard => {
+            const movieTitle = movieCard.getAttribute("data-title").toLowerCase();
+            if (movieTitle.includes(searchString)) {
+                movieCard.style.display = "block";
+            } else {
+                movieCard.style.display = "none";
+            }
+        });
+    });
+</script>
+</body>
+</html>
